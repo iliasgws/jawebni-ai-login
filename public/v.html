@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Vos identifiants · Jawebni</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Aller au contenu</a>
+    <div class="shell shell-narrow" id="app">
+      <div class="topbar">
+        <a class="brand" href="/">
+          <img class="brand-logo" src="/logo.png" alt="Jawebni" width="1208" height="594" />
+          <span>
+            <small>identifiants du compte</small>
+          </span>
+        </a>
+        <div class="meta">
+          <span class="badge hidden" id="serviceBadge"></span>
+        </div>
+      </div>
+
+      <div class="loading" id="loader" role="status">
+        <span class="spinner" aria-hidden="true"></span>
+        <span>Chargement de vos identifiants…</span>
+      </div>
+
+      <div id="errorBox" class="notice error hidden" role="alert">
+        <div id="errorText"></div>
+        <button class="btn sm ghost" id="errorRetry" type="button">Réessayer</button>
+      </div>
+
+      <div id="content" class="hidden" tabindex="-1">
+        <section class="panel">
+          <div class="panel-title">
+            <div>
+              <h1 id="welcome">Bonjour</h1>
+              <div class="hint" id="sub"></div>
+            </div>
+            <span class="badge ok" id="daysBadge"></span>
+          </div>
+
+          <div class="grid" id="creds" style="gap: 10px"></div>
+
+          <div class="notice" style="margin-top: 16px">
+            Ne modifiez pas le mot de passe et n'activez aucune nouvelle double authentification,
+            sinon le compte risque de ne plus être utilisable.
+          </div>
+          <div class="notice error hidden" id="discardBox" style="margin-top: 12px">
+            Ces identifiants ont été révoqués. Pour toute question, contactez le support.
+          </div>
+          <div class="notice hidden" id="remarkBox" style="margin-top: 12px"></div>
+        </section>
+
+        <section class="panel hidden" id="totpPanel">
+          <div class="panel-title">
+            <h2>Code de double authentification</h2>
+            <span class="hint">change toutes les <span id="periodHint">30</span> s</span>
+          </div>
+
+          <div class="totp" id="totpIdle">
+            <button class="btn primary" id="totpBtn" style="width: 100%">
+              Obtenir le code d'authentification
+            </button>
+          </div>
+
+          <div class="totp hidden" id="totpLive">
+            <div class="code" id="totpCode">— — —</div>
+            <div class="right">
+              <div class="row">
+                <span id="totpNote">Ce code change bientôt.</span>
+                <span class="mono" id="totpSecs">0s</span>
+              </div>
+              <div class="bar"><i id="totpBar"></i></div>
+            </div>
+            <button class="iconbtn" type="button" id="totpCopy" aria-label="Copier le code" title="Copier le code">⧉</button>
+          </div>
+
+          <div class="notice error hidden" id="totpError" style="margin-top: 12px"></div>
+        </section>
+
+        <section class="panel hidden" id="codePanel">
+          <div class="panel-title">
+            <h2>Code de vérification par e-mail</h2>
+            <span class="hint">1 à 2 minutes</span>
+          </div>
+
+          <div class="notice error hidden" id="codeError" style="margin-bottom: 14px"></div>
+
+          <div class="totp hidden" id="codeLive">
+            <div class="code" id="codeValue">— — —</div>
+            <div class="right">
+              <div class="row">
+                <span id="codeStatus">Code reçu</span>
+                <span class="mono dim">e-mail</span>
+              </div>
+            </div>
+            <button class="iconbtn" type="button" id="codeCopy" aria-label="Copier le code" title="Copier le code">⧉</button>
+          </div>
+
+          <button class="btn primary" id="codeBtn" style="width: 100%">Obtenir le code</button>
+          <p class="dim" style="font-size: var(--fs-sm); margin: 12px 0 0">
+            Si la page de connexion demande un code envoyé à l'e-mail du compte, récupérez-le ici.
+          </p>
+        </section>
+
+        <section class="panel hidden" id="stepsPanel">
+          <div class="panel-title"><h2>Comment se connecter</h2></div>
+          <ol class="steps" id="steps"></ol>
+        </section>
+      </div>
+
+      <p class="dim" style="text-align: center; font-size: var(--fs-sm); margin-top: 24px">
+        Lien personnel · ne le partagez avec personne d'autre.
+      </p>
+    </div>
+
+    <script type="module" src="/v.js"></script>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "jawebni-ai-login",
+  "private": true,
+  "type": "module",
+  "description": "Obfuscated delivery-link portal with admin link generator",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "check": "node --check server.js && node --check lib/store.js && node --check lib/ids.js && node --check lib/gamsgo.js && node --check public/ui.js && node --check public/admin.js && node --check public/v.js && node --check public/gate.js"
+  }
+}
