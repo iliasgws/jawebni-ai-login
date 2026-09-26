@@ -2,10 +2,47 @@
 
 ## Project Overview
 
-`jawebni-ai-login` — obfuscated delivery-link portal with an admin link generator (Node.js >= 20, ESM, no framework).
+`jawebni-ai-login` — a delivery portal for purchased account credentials. Customers open a personal, unguessable link and see their account (login, password, TOTP/email verification codes); agents use an admin panel to issue, list, and revoke links. Zero-dependency Node.js (>= 20, ESM, no framework, no build step). Customer-facing UI is in French.
 
-- Run: `npm start` / `npm dev` (`node --watch server.js`)
-- Syntax check: `npm run check`
+- Run: `npm start` / `npm run dev` (`node --watch server.js`)
+- Syntax check (the only "lint"): `npm run check`
+- No test suite exists. At minimum run `npm run check` after every change; verify behavior manually with `npm run dev` + curl.
+
+## Architecture
+
+- `server.js` — the whole HTTP server: routing, static file serving, admin auth (session cookie, 12h TTL), and all JSON API endpoints. No framework; hand-rolled `http` server.
+- `lib/store.js` — persistence layer. Reads/writes `data/store.json` (links, salt, verify state). This is the only mutable state.
+- `lib/ids.js` — link ID scheme. Public IDs are a one-way hash of order id + per-link random value + server-side salt; never expose order numbers or the delivery token in URLs.
+- `lib/gamsgo.js` — GamsGo API client (order verification, TOTP/email code fetching, background code jobs). Defaults/env in `GAMSGO_DELIVERY_API.md`.
+- `public/` — static frontend, plain JS:
+  - `index.html` + `ui.js` — customer delivery page
+  - `admin.html` + `admin.js` — agent panel
+  - `v.html` + `v.js`, `gate.js` — verification/gate pages
+  - `style.css` — shared styles
+
+## Environment Variables
+
+`ADMIN_PASSWORD` (default `change-me`), `GAMSGO_ORDER_SN`, `GAMSGO_TOKEN`, `PORT` (3000), `HOST` (0.0.0.0). See `GAMSGO_DELIVERY_API.md` for the delivery-token default and API details.
+
+## Conventions
+
+- ESM (`import`/`export`) only; Node >= 20 built-ins. Do NOT add npm dependencies — the project is intentionally zero-dependency.
+- Keep everything in the existing file layout; don't introduce a framework, build step, or bundler.
+- Customer-facing text is French; admin-facing text may be English.
+- `data/store.json` is runtime state — never commit changes to it or hand-edit it except to test.
+- Security-sensitive: never leak the delivery token, salt, or order SN into URLs, logs, or the frontend.
+
+## Git & PR Workflow (mandatory)
+
+For EVERY change an agent makes to this repository, regardless of size:
+
+1. **Create a GitHub issue first** describing the change (use `gh issue create`). Reference it in commits (`#<n>`).
+2. **Work on a dedicated branch** — never commit directly to `main`. Branch name: `<type>/<short-desc>` (e.g. `fix/session-expiry`, `feat/download-csv`).
+3. **Open a pull request** with `gh pr create`, linking the issue (`Closes #<n>` in the PR body).
+4. **NEVER merge the PR** — no `gh pr merge`, no push to `main`, no local merge. The user reviews and merges manually.
+5. Run `npm run check` before opening the PR; mention the result in the PR body.
+
+This applies to bug fixes, features, refactors, docs, and config alike. Trivial one-line typo fixes still go through the same flow — the only exception is when the user explicitly says to commit straight to `main`.
 
 ## Task Management
 
@@ -32,68 +69,3 @@ IMPORTANT: These are mandatory workflow rules.
 - Before giving the final response, inspect the todo list and ensure there are no incorrectly pending or in-progress tasks.
 - If work remains unfinished, leave those tasks visibly pending and explicitly explain why.
 - The todo list is the authoritative execution plan for the current request.
-
-## Required Workflow
-
-For any meaningful coding request, follow this sequence:
-
-```
-USER REQUEST
-↓
-Understand requirements
-↓
-Inspect relevant code if necessary
-↓
-CREATE/UPDATE TODO LIST USING `todowrite`
-↓
-Mark first task `in_progress`
-↓
-Implement
-↓
-Verify that task
-↓
-Immediately mark it `completed`
-↓
-Mark next task `in_progress`
-↓
-Continue
-↓
-Add/revise tasks dynamically when discoveries are made
-↓
-Run final verification
-↓
-Complete final task
-↓
-Respond to user
-```
-
-Never skip the todo-list step because a task "looks simple" if it actually involves several implementation actions.
-
-## Anti-Forgetting Rule
-
-At the beginning of EACH new user request, explicitly determine:
-
-"Does this require more than one meaningful action?"
-
-If YES: IMMEDIATELY call `todowrite` before implementation.
-
-During implementation, after every meaningful completed milestone, ask internally:
-
-"Does the todo list accurately represent the current state of the work?"
-
-If NO: update it immediately with `todowrite`.
-
-This is not optional.
-
-## Do Not Fake Task Tracking
-
-The following are NOT acceptable substitutes for the real task list:
-
-- Writing "TODO:"
-- Markdown checkboxes in your response
-- Describing what you intend to do without invoking the tool
-- Creating tasks only after implementation has already started
-- Creating the entire list at the start and never updating statuses
-- Marking every task completed in one batch at the end
-
-The actual OpenCode task list must change live as work progresses.
