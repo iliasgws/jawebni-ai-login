@@ -78,6 +78,18 @@ const STRINGS = {
     "guide.title": "Guide visuel",
     "guide.alt":
       "Comment se connecter : guide illustré en trois étapes — adresse e-mail, mot de passe, vérification.",
+    "guide.a1": "Étape 1 : ouvrez la page de connexion du service et cliquez sur « Log in ».",
+    "guide.a2":
+      "Étape 2 : copiez le compte de connexion et collez-le dans le champ adresse e-mail.",
+    "guide.a3": "Étape 3 : cliquez sur « Continuer ».",
+    "guide.a4":
+      "Étape 4 : copiez le mot de passe de connexion et collez-le dans le champ du mot de passe.",
+    "guide.a5": "Étape 5 : cliquez sur « Continuer ».",
+    "guide.a6":
+      "Étape 6 : touchez la feuille pour révéler le code de double authentification.",
+    "guide.a7": "Étape 7 : saisissez le code à usage unique dans le champ indiqué.",
+    "guide.a8":
+      "Étape 8 : cliquez sur « Continuer » ; utilisez le code de vérification par e-mail si demandé.",
   },
 
   en: {
@@ -147,6 +159,17 @@ const STRINGS = {
     "guide.title": "Visual guide",
     "guide.alt":
       "How to sign in: illustrated three-step guide — email address, password, verification.",
+    "guide.a1": "Step 1: open the service sign-in page and click \"Log in\".",
+    "guide.a2":
+      "Step 2: copy the sign-in account and paste it into the email address field.",
+    "guide.a3": "Step 3: click \"Continue\".",
+    "guide.a4":
+      "Step 4: copy the sign-in password and paste it into the password field.",
+    "guide.a5": "Step 5: click \"Continue\".",
+    "guide.a6": "Step 6: touch the foil to reveal the two-factor code.",
+    "guide.a7": "Step 7: enter the one-time code in the highlighted field.",
+    "guide.a8":
+      "Step 8: click \"Continue\"; use the email verification code if asked.",
   },
 
   ar: {
@@ -214,6 +237,14 @@ const STRINGS = {
     "steps.title": "كيفية تسجيل الدخول",
     "guide.title": "دليل مصور",
     "guide.alt": "كيفية تسجيل الدخول: دليل مصور في ثلاث خطوات — البريد الإلكتروني، كلمة المرور، التحقق.",
+    "guide.a1": "الخطوة 1: افتح صفحة تسجيل الدخول للخدمة وانقر على «Log in».",
+    "guide.a2": "الخطوة 2: انسخ حساب تسجيل الدخول والصقه في حقل البريد الإلكتروني.",
+    "guide.a3": "الخطوة 3: انقر على «Continuer».",
+    "guide.a4": "الخطوة 4: انسخ كلمة مرور الدخول والصقها في حقل كلمة المرور.",
+    "guide.a5": "الخطوة 5: انقر على «Continuer».",
+    "guide.a6": "الخطوة 6: المس الورقة لإظهار رمز التحقق الثنائي.",
+    "guide.a7": "الخطوة 7: أدخل رمز الاستخدام الواحد في الحقل المحدد.",
+    "guide.a8": "الخطوة 8: انقر على «Continuer»؛ استخدم رمز التحقق بالبريد الإلكتروني إذا طُلب.",
   },
 };
 
