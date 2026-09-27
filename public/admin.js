@@ -180,7 +180,7 @@ function renderGenerated(link, recipe) {
     `<div><b>order id</b><span>${esc(recipe.seed.split("\n")[0])} <span class="dim">← never appears in the URL</span></span></div>`,
     `<div><b>random noise</b><span>${esc(recipe.seed.split("\n")[1])} <span class="dim">← fresh per link</span></span></div>`,
     `<div><b>salt</b><span>${esc(recipe.maskedSalt)} <span class="dim">← server-side only</span></span></div>`,
-    `<div><b>sha256</b><span>${recipe.digest.slice(0, 32)}… → base32 → <span style="color:var(--accent-2)">${esc(recipe.id)}</span></span></div>`,
+    `<div><b>sha256</b><span>${recipe.digest.slice(0, 32)}… → base32 → <span style="color:var(--gold-deep)">${esc(recipe.id)}</span></span></div>`,
   ].join("");
   show($("generated"), true);
   $("generated").scrollIntoView({
@@ -239,13 +239,13 @@ function renderRows() {
             <button class="btn sm ghost" data-act="delete-cancel">Cancel</button>`
           : `<button class="btn sm" data-act="copy" data-url="${esc(url)}">Copy</button>
             <a class="btn sm ghost" href="${esc(url)}" target="_blank" rel="noopener">Open</a>
-            <button class="btn sm ghost danger" data-act="delete" aria-label="Delete the link for ${esc(l.name)}">Delete</button>`;
+            <button class="btn sm ghost danger" data-act="delete" aria-label="Revoke the link for ${esc(l.name)}">Revoke</button>`;
       return `<tr data-id="${esc(l.id)}">
-        <td><strong>${esc(l.name)}</strong></td>
-        <td class="mono">${esc(l.phone)}</td>
-        <td class="id">${esc(l.id)}</td>
-        <td class="dim" style="font-size: var(--fs-sm)">${esc(created)}</td>
-        <td>
+        <td data-label="Name"><strong>${esc(l.name)}</strong></td>
+        <td data-label="Phone" class="mono">${esc(l.phone)}</td>
+        <td data-label="Link id" class="id">${esc(l.id)}</td>
+        <td data-label="Created" class="dim" style="font-size: var(--fs-sm)">${esc(created)}</td>
+        <td data-label="">
           <div class="actions">${actions}</div>
         </td>
       </tr>`;
@@ -254,17 +254,30 @@ function renderRows() {
 
   const emptyEl = $("empty");
   if (listLoading) {
-    $("emptyText").textContent = "Loading links…";
+    // Operate surfaces load into skeletons, not a spinner mid-content.
+    $("rows").innerHTML = Array.from({ length: 3 }, () => {
+      const cell = (w) => `<span class="skeleton" style="width:${w}"></span>`;
+      return `<tr class="skeleton-row" aria-hidden="true">
+        <td>${cell("68%")}</td>
+        <td>${cell("54%")}</td>
+        <td>${cell("84%")}</td>
+        <td>${cell("62%")}</td>
+        <td>${cell("40%")}</td>
+      </tr>`;
+    }).join("");
     show($("clearSearch"), false);
-    show(emptyEl, true);
-    show($("table"), false);
+    show(emptyEl, false);
+    show($("table"), true);
     return;
   }
   if (rows.length === 0 && q) {
     $("emptyText").textContent = "No links match your search.";
+    $("emptyHint").textContent = "Try the customer's name, phone number, or link id.";
     show($("clearSearch"), true);
   } else if (rows.length === 0) {
     $("emptyText").textContent = "No links issued yet.";
+    $("emptyHint").textContent =
+      "Fill in a name and phone number above, then Generate link to create the first one.";
     show($("clearSearch"), false);
   }
   show($("table"), rows.length > 0);

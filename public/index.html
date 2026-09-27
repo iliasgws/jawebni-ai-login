@@ -4,38 +4,90 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex,nofollow" />
-    <title>Jawebni · Accès</title>
+    <title data-i18n="doc.title">Jawebni · Accès</title>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="stylesheet" href="/style.css" />
+    <script>
+      /* set lang + direction before first paint so Arabic never flashes LTR */
+      try {
+        var l = localStorage.getItem("jawebni.lang");
+        if (l === "fr" || l === "en" || l === "ar") {
+          document.documentElement.lang = l;
+          document.documentElement.dir = l === "ar" ? "rtl" : "ltr";
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
+    <svg class="sprite" aria-hidden="true">
+      <defs>
+        <symbol id="i-globe" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9.5" />
+          <path d="M2.5 12h19" />
+          <path d="M12 2.5a15 15 0 0 1 4 9.5 15 15 0 0 1-4 9.5 15 15 0 0 1-4-9.5 15 15 0 0 1 4-9.5z" />
+        </symbol>
+        <symbol id="i-ticket" viewBox="0 0 24 24">
+          <rect x="2.5" y="5.5" width="19" height="13" rx="2" />
+          <path d="M2.5 10h19" />
+          <path d="M6 14.5h5" />
+        </symbol>
+      </defs>
+    </svg>
+
     <div class="center-screen">
-      <main class="card panel">
-        <a class="brand brand-card" href="/" style="margin-bottom: 18px">
-          <img class="brand-logo" src="/logo.png" alt="Jawebni" width="1208" height="594" />
-        </a>
-        <h1>Saisissez votre code d'accès</h1>
-        <p class="muted" style="margin: 6px 0 20px; font-size: var(--fs-ui)">
-          Le code vous a été transmis par notre équipe après votre commande.
-        </p>
-        <form id="tokenForm" novalidate>
-          <label class="field" for="token">Code d'accès</label>
-          <input
-            type="text"
-            id="token"
-            autocomplete="off"
-            spellcheck="false"
-            autocapitalize="characters"
-            aria-describedby="tokenError"
-            required
-          />
-          <div class="field-error hidden" id="tokenError"></div>
-          <button class="btn primary" type="submit" style="width: 100%; margin-top: 16px">
-            Voir mes identifiants
-          </button>
-        </form>
+      <main class="ticket">
+        <div class="ticket-head">
+          <a class="brand brand-card" href="/">
+            <img class="brand-logo" src="/logo.png" alt="Jawebni" width="1208" height="594" />
+          </a>
+          <div class="langsw-wrap">
+            <svg class="ic ic-sm" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-globe" /></svg>
+            <div class="langsw" role="group" data-langsw data-i18n-aria="a11y.lang">
+              <button type="button" data-lang="fr" lang="fr" aria-pressed="true">FR</button>
+              <button type="button" data-lang="en" lang="en" aria-pressed="false">EN</button>
+              <button type="button" data-lang="ar" lang="ar" aria-pressed="false">AR</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tear" aria-hidden="true"></div>
+
+        <div class="ticket-body pad">
+          <h1 data-i18n="gate.heading">Saisissez votre code d'accès</h1>
+          <p class="lead" data-i18n="gate.sub">
+            Le code vous a été transmis par notre équipe après votre commande.
+          </p>
+
+          <form id="tokenForm" novalidate>
+            <label class="field" for="token" data-i18n="gate.label">Code d'accès</label>
+            <div class="slot">
+              <input
+                type="text"
+                id="token"
+                dir="ltr"
+                autocomplete="off"
+                spellcheck="false"
+                autocapitalize="characters"
+                inputmode="text"
+                aria-describedby="tokenError"
+                data-i18n-placeholder="gate.placeholder"
+                required
+              />
+            </div>
+            <div class="field-error hidden" id="tokenError" role="alert"></div>
+            <button class="btn primary block form-actions" type="submit" data-i18n="gate.submit">
+              Voir mes identifiants
+            </button>
+          </form>
+        </div>
+
+        <div class="tear" aria-hidden="true"></div>
+        <div class="ticket-stub">
+          <p data-i18n="brand.foot">Lien personnel · ne le partagez avec personne d'autre.</p>
+        </div>
       </main>
     </div>
+
     <script type="module" src="/gate.js"></script>
   </body>
 </html>
