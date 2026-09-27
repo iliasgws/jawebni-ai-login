@@ -2,3 +2,8 @@ data/
 node_modules/
 *.log
 .DS_Store
+.impeccable/config.local.json
+.impeccable/hook.cache.json
+.impeccable/review/
+# Impeccable engine binaries: platform-specific, re-fetched by the launcher
+.agents/skills/impeccable/scripts/bin/

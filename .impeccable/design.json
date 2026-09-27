@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "extends": "DESIGN.md",
+  "narrative": {
+    "northStar": "A printed recharge ticket lying on a petrol counter: bone card stock, a cut corner, a dashed perforation, and a gold foil panel you tap to reveal the live code.",
+    "rules": [
+      "Elevation is a hairline rule. No box-shadows except the focus ring.",
+      "The mark always sits on card stock, never on the counter.",
+      "Roles are semantic: gold = action and foil, oxide = destructive and revoked, positive = ready.",
+      "Tonal surfaces come only from the stock ramp or a declared role wash.",
+      "Tabular mono is the display voice; tracked caps label fields, never sentences or headings."
+    ],
+    "dos": [
+      "Mirror every inset, origin, and the cut corner under dir=rtl.",
+      "Give codes, ids, and countdowns tabular figures.",
+      "Use skeletons for loading and teaching copy for empty states."
+    ],
+    "donts": [
+      "No shadow-based elevation, gradient text, glass decoration, or feTurbulence grain.",
+      "No colored border-left/right above 1px on cards, callouts, or alerts.",
+      "No emoji or Unicode glyphs standing in for icons.",
+      "No cream ground with a serif display face."
+    ]
+  },
+  "ramps": {
+    "stock": ["#fbf8f2", "#e9e2d5", "#ded5c5"],
+    "counterText": ["#e7edea", "#b9c4c2", "#8fa3a1"],
+    "ink": ["#1a1512", "#574c42", "#6b6055"]
+  },
+  "elevation": {
+    "strategy": "rule-only",
+    "border": "1px solid {colors.rule}",
+    "shadow": "none",
+    "focusRing": "0 0 0 3px #fbeed4, 0 0 0 4px #8a5f09"
+  },
+  "motion": {
+    "duration": {
+      "fast": "80ms",
+      "base": "150ms",
+      "reveal": "420ms",
+      "stamp": "900ms",
+      "meter": "1s linear"
+    },
+    "easing": {
+      "reveal": "cubic-bezier(0.22, 0.61, 0.24, 1)",
+      "default": "ease-out"
+    },
+    "signature": "The foil sweep: clip-path inset(0 0 0 100%) on LTR, inset(0 100% 0 0) on RTL, then display:none after 460ms.",
+    "busy": "A vertical glint pulse on the veil icon (scale 0.92 → 1, opacity 0.4 → 1) — never a horizontal loop.",
+    "reducedMotion": "prefers-reduced-motion collapses all durations to 0.01ms and hides the veil immediately."
+  },
+  "breakpoints": {
+    "stacked": "760px"
+  },
+  "regions": {
+    "page": "{colors.counter}",
+    "card": "{colors.stock-face}",
+    "stub": "{colors.stock-stub}",
+    "field": "{colors.stock-stub}",
+    "foil": "{colors.gold}"
+  },
+  "texture": {
+    "foil-grain": "radial-gradient(circle at 1px 1px, #fff1c4 0.85px, transparent 1.15px) at 3px 3px over radial-gradient(circle at 2.5px 2.5px, #b87a0f 0.7px, transparent 1.05px) at 5px 5px, under one broad 112deg sheen",
+    "rationale": "Metal must read as metal, but ink text has to stay ≥4.5:1 across the whole panel; grain coverage is therefore kept low so gold stays gold."
+  },
+  "components": {
+    "ticket": {
+      "css": "background: var(--stock-2); border: 1px solid var(--rule); border-radius: 8px; clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);",
+      "note": "18px cut top-right; mirror to polygon(18px 0, 100% 0, 100% 100%, 0 100%, 0 18px) under dir=rtl."
+    },
+    "tear": {
+      "css": "border-top: 1px dashed var(--rule-2); plus two 16px counter-coloured circles centred on each edge, transform: translateY(-50%)."
+    },
+    "foil": {
+      "css": "position: relative; overflow: hidden; min-height: 108px; background: gold grain; veil absolutely fills the panel and is clipped away when open."
+    },
+    "stamp": {
+      "css": "display: inline-flex; border: 1px solid currentColor; border-radius: 2px; padding: 5px 9px; font: 700 11px/1.55 mono; text-transform: uppercase; letter-spacing: 0.08em;"
+    },
+    "notice-plate": {
+      "css": "border: 1px solid var(--oxide); background: var(--oxide-wash); color: var(--ink); icon injected via CSS mask so textContent can overwrite children safely."
+    }
+  },
+  "sprite": {
+    "css": ".sprite { display: none; }",
+    "rationale": "The hidden attribute is ignored on SVG; a bare <svg> lays out at 300x150 and pushes 156px of dead space onto the page. Symbols stay referenceable by <use> while display:none."
+  },
+  "i18n": {
+    "languages": ["fr", "en", "ar"],
+    "default": "fr",
+    "rtl": "html[lang=ar] gets dir=rtl; an inline head script applies lang+dir before first paint so Arabic never flashes LTR.",
+    "ltrSpans": "Credential values, passwords, emails, and codes always render dir=ltr regardless of page direction."
+  }
+}

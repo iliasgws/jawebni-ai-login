@@ -4,116 +4,243 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex,nofollow" />
-    <title>Vos identifiants · Jawebni</title>
+    <title data-i18n="doc.title.cred">Vos identifiants · Jawebni</title>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="stylesheet" href="/style.css" />
+    <script>
+      /* set lang + direction before first paint so Arabic never flashes LTR */
+      try {
+        var l = localStorage.getItem("jawebni.lang");
+        if (l === "fr" || l === "en" || l === "ar") {
+          document.documentElement.lang = l;
+          document.documentElement.dir = l === "ar" ? "rtl" : "ltr";
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
-    <a class="skip-link" href="#content">Aller au contenu</a>
+    <svg class="sprite" aria-hidden="true">
+      <defs>
+        <symbol id="i-globe" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9.5" />
+          <path d="M2.5 12h19" />
+          <path d="M12 2.5a15 15 0 0 1 4 9.5 15 15 0 0 1-4 9.5 15 15 0 0 1-4-9.5 15 15 0 0 1 4-9.5z" />
+        </symbol>
+        <symbol id="i-ticket" viewBox="0 0 24 24">
+          <rect x="2.5" y="5.5" width="19" height="13" rx="2" />
+          <path d="M2.5 10h19" />
+          <path d="M6 14.5h5" />
+        </symbol>
+        <symbol id="i-copy" viewBox="0 0 24 24">
+          <rect x="9" y="9" width="12.5" height="12.5" rx="2" />
+          <path d="M5.5 14.5H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 2 2v.5" />
+        </symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24">
+          <path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12z" />
+          <circle cx="12" cy="12" r="3" />
+        </symbol>
+        <symbol id="i-eyeOff" viewBox="0 0 24 24">
+          <path
+            d="M17.9 17.9A10.1 10.1 0 0 1 12 19.5c-6.5 0-10.5-7.5-10.5-7.5a18.5 18.5 0 0 1 5.1-6M9.9 4.6A9.1 9.1 0 0 1 12 4.3c6.5 0 10.5 7.5 10.5 7.5a18.5 18.5 0 0 1-2.2 3.2M9.9 9.9a3 3 0 1 0 4.2 4.2"
+          />
+          <path d="M3 3l18 18" />
+        </symbol>
+        <symbol id="i-mail" viewBox="0 0 24 24">
+          <rect x="2.5" y="4.5" width="19" height="15" rx="2" />
+          <path d="M3 6.5l9 6.5 9-6.5" />
+        </symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24">
+          <path d="M12 21.5s7.5-3.8 7.5-9.5V5.4L12 2.5 4.5 5.4V12c0 5.7 7.5 9.5 7.5 9.5z" />
+          <path d="M9.2 11.8l2 2 3.6-3.8" />
+        </symbol>
+        <symbol id="i-key" viewBox="0 0 24 24">
+          <circle cx="15.5" cy="8.5" r="5.5" />
+          <path d="M11.6 12.4L2.5 21.5" />
+          <path d="M6 18l2.5 2.5" />
+        </symbol>
+      </defs>
+    </svg>
+
+    <a class="skip-link" href="#content" data-i18n="a11y.skip">Aller au contenu</a>
+
     <div class="shell shell-narrow" id="app">
-      <div class="topbar">
-        <a class="brand" href="/">
-          <img class="brand-logo" src="/logo.png" alt="Jawebni" width="1208" height="594" />
-          <span>
-            <small>identifiants du compte</small>
+      <!-- ------------------------------------------------------ loading -->
+      <div class="ticket" id="loader" role="status" aria-live="polite">
+        <div class="ticket-head">
+          <span class="brand">
+            <img class="brand-logo" src="/logo.png" alt="Jawebni" width="1208" height="594" />
           </span>
-        </a>
-        <div class="meta">
-          <span class="badge hidden" id="serviceBadge"></span>
+        </div>
+        <div class="tear" aria-hidden="true"></div>
+        <div class="ticket-body pad" aria-hidden="true">
+          <div class="sk-row">
+            <span class="skeleton sk-label"></span>
+            <span class="skeleton sk-value"></span>
+            <span class="skeleton sk-act"></span>
+          </div>
+          <div class="sk-row">
+            <span class="skeleton sk-label"></span>
+            <span class="skeleton sk-value"></span>
+            <span class="skeleton sk-act"></span>
+          </div>
+          <div class="sk-row">
+            <span class="skeleton sk-label"></span>
+            <span class="skeleton sk-value"></span>
+            <span class="skeleton sk-act"></span>
+          </div>
+        </div>
+        <div class="sr-only" data-i18n="cred.loading">Chargement de vos identifiants…</div>
+      </div>
+
+      <!-- -------------------------------------------------------- error -->
+      <div id="errorBox" class="notice error hidden" role="alert">
+        <div>
+          <div id="errorText"></div>
+          <button class="btn sm ghost" id="errorRetry" type="button" data-i18n="cred.retry">
+            Réessayer
+          </button>
         </div>
       </div>
 
-      <div class="loading" id="loader" role="status">
-        <span class="spinner" aria-hidden="true"></span>
-        <span>Chargement de vos identifiants…</span>
-      </div>
-
-      <div id="errorBox" class="notice error hidden" role="alert">
-        <div id="errorText"></div>
-        <button class="btn sm ghost" id="errorRetry" type="button">Réessayer</button>
-      </div>
-
+      <!-- ----------------------------------------------------- content -->
       <div id="content" class="hidden" tabindex="-1">
-        <section class="panel">
-          <div class="panel-title">
-            <div>
-              <h1 id="welcome">Bonjour</h1>
-              <div class="hint" id="sub"></div>
-            </div>
-            <span class="badge ok" id="daysBadge"></span>
-          </div>
-
-          <div class="grid" id="creds" style="gap: 10px"></div>
-
-          <div class="notice" style="margin-top: 16px">
-            Ne modifiez pas le mot de passe et n'activez aucune nouvelle double authentification,
-            sinon le compte risque de ne plus être utilisable.
-          </div>
-          <div class="notice error hidden" id="discardBox" style="margin-top: 12px">
-            Ces identifiants ont été révoqués. Pour toute question, contactez le support.
-          </div>
-          <div class="notice hidden" id="remarkBox" style="margin-top: 12px"></div>
-        </section>
-
-        <section class="panel hidden" id="totpPanel">
-          <div class="panel-title">
-            <h2>Code de double authentification</h2>
-            <span class="hint">change toutes les <span id="periodHint">30</span> s</span>
-          </div>
-
-          <div class="totp" id="totpIdle">
-            <button class="btn primary" id="totpBtn" style="width: 100%">
-              Obtenir le code d'authentification
-            </button>
-          </div>
-
-          <div class="totp hidden" id="totpLive">
-            <div class="code" id="totpCode">— — —</div>
-            <div class="right">
-              <div class="row">
-                <span id="totpNote">Ce code change bientôt.</span>
-                <span class="mono" id="totpSecs">0s</span>
-              </div>
-              <div class="bar"><i id="totpBar"></i></div>
-            </div>
-            <button class="iconbtn" type="button" id="totpCopy" aria-label="Copier le code" title="Copier le code">⧉</button>
-          </div>
-
-          <div class="notice error hidden" id="totpError" style="margin-top: 12px"></div>
-        </section>
-
-        <section class="panel hidden" id="codePanel">
-          <div class="panel-title">
-            <h2>Code de vérification par e-mail</h2>
-            <span class="hint">1 à 2 minutes</span>
-          </div>
-
-          <div class="notice error hidden" id="codeError" style="margin-bottom: 14px"></div>
-
-          <div class="totp hidden" id="codeLive">
-            <div class="code" id="codeValue">— — —</div>
-            <div class="right">
-              <div class="row">
-                <span id="codeStatus">Code reçu</span>
-                <span class="mono dim">e-mail</span>
+        <!-- the ticket: identity, then the printed credentials -->
+        <section class="ticket">
+          <div class="ticket-head">
+            <a class="brand" href="/">
+              <img class="brand-logo" src="/logo.png" alt="Jawebni" width="1208" height="594" />
+              <span><small data-i18n="brand.account">identifiants du compte</small></span>
+            </a>
+            <div class="langsw-wrap">
+              <svg class="ic ic-sm" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-globe" /></svg>
+              <div class="langsw" role="group" data-langsw data-i18n-aria="a11y.lang">
+                <button type="button" data-lang="fr" lang="fr" aria-pressed="true">FR</button>
+                <button type="button" data-lang="en" lang="en" aria-pressed="false">EN</button>
+                <button type="button" data-lang="ar" lang="ar" aria-pressed="false">AR</button>
               </div>
             </div>
-            <button class="iconbtn" type="button" id="codeCopy" aria-label="Copier le code" title="Copier le code">⧉</button>
           </div>
 
-          <button class="btn primary" id="codeBtn" style="width: 100%">Obtenir le code</button>
-          <p class="dim" style="font-size: var(--fs-sm); margin: 12px 0 0">
-            Si la page de connexion demande un code envoyé à l'e-mail du compte, récupérez-le ici.
-          </p>
+          <div class="tear" aria-hidden="true"></div>
+
+          <div class="ticket-body pad">
+            <div class="panel-title">
+              <div>
+                <h1 id="welcome">Bonjour</h1>
+                <div class="hint" id="sub"></div>
+              </div>
+              <span class="badge ok hidden" id="daysBadge"></span>
+            </div>
+
+            <div class="grid" id="creds"></div>
+          </div>
+
+          <div class="tear" aria-hidden="true"></div>
+
+          <div class="ticket-stub">
+            <div class="notice plate">
+              <div>
+                <strong class="plate-label caps" data-i18n="cred.keepSafe.label">Important</strong>
+                <span data-i18n="cred.keepSafe"
+                  >Ne modifiez pas le mot de passe et n'activez aucune nouvelle double
+                  authentification, sinon le compte risque de ne plus être utilisable.</span
+                >
+              </div>
+            </div>
+            <div class="void hidden" id="discardBox" role="alert" style="margin-top: 14px">
+              <span id="discardStamp" data-i18n="cred.revoked.stamp">Révoqué</span>
+              <span class="void-sub" data-i18n="cred.revoked"
+                >Ces identifiants ont été révoqués. Pour toute question, contactez le support.</span
+              >
+            </div>
+            <div class="notice hidden" id="remarkBox" style="margin-top: 12px"></div>
+          </div>
         </section>
 
-        <section class="panel hidden" id="stepsPanel">
-          <div class="panel-title"><h2>Comment se connecter</h2></div>
-          <ol class="steps" id="steps"></ol>
+        <!-- the foil: the live two-factor code -->
+        <section class="ticket hidden" id="totpPanel">
+          <div class="ticket-head">
+            <h2 data-i18n="totp.title">Code de double authentification</h2>
+            <span class="hint" id="totpPeriod"></span>
+          </div>
+          <div class="tear" aria-hidden="true"></div>
+          <div class="ticket-body pad">
+            <div class="foil" id="totpFoil">
+              <button class="foil-veil" id="totpBtn" type="button">
+                <svg class="ic ic-lg" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-ticket" /></svg>
+                <span class="foil-veil-label" id="totpVeilLabel" data-i18n="foil.reveal"
+                  >Touchez la feuille pour révéler le code</span
+                >
+                <span class="foil-veil-hint" data-i18n="foil.hint">Un appui suffit</span>
+              </button>
+              <div class="foil-body" id="totpLive" hidden>
+                <div class="code" id="totpCode" dir="ltr">— — —</div>
+                <div class="right">
+                  <div class="row">
+                    <span id="totpNote"></span>
+                    <span class="mono" id="totpSecs"></span>
+                  </div>
+                  <div class="bar"><i id="totpBar"></i></div>
+                </div>
+                <button class="iconbtn" type="button" id="totpCopy" data-i18n-aria="totp.copy">
+                  <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy" /></svg>
+                </button>
+              </div>
+            </div>
+            <div class="notice error hidden" id="totpError" style="margin-top: 12px"></div>
+          </div>
+        </section>
+
+        <!-- the foil: the live email code -->
+        <section class="ticket hidden" id="codePanel">
+          <div class="ticket-head">
+            <h2 data-i18n="code.title">Code de vérification par e-mail</h2>
+            <span class="hint" data-i18n="code.window">1 à 2 minutes</span>
+          </div>
+          <div class="tear" aria-hidden="true"></div>
+          <div class="ticket-body pad">
+            <div class="notice error hidden" id="codeError" style="margin-bottom: 14px"></div>
+
+            <div class="foil" id="codeFoil">
+              <button class="foil-veil" id="codeBtn" type="button">
+                <svg class="ic ic-lg" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mail" /></svg>
+                <span class="foil-veil-label" id="codeVeilLabel" data-i18n="code.get"
+                  >Obtenir le code</span
+                >
+                <span class="foil-veil-hint" data-i18n="foil.hint">Un appui suffit</span>
+              </button>
+              <div class="foil-body" id="codeLive" hidden>
+                <div class="code" id="codeValue" dir="ltr">— — —</div>
+                <div class="right">
+                  <div class="row">
+                    <span id="codeStatus"></span>
+                  </div>
+                </div>
+                <button class="iconbtn" type="button" id="codeCopy" data-i18n-aria="code.copy">
+                  <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy" /></svg>
+                </button>
+              </div>
+            </div>
+
+            <p class="dim" style="font-size: var(--fs-sm); margin: 14px 0 0" data-i18n="code.help">
+              Si la page de connexion demande un code envoyé à l'e-mail du compte, récupérez-le ici.
+            </p>
+          </div>
+        </section>
+
+        <!-- the stub: how to sign in -->
+        <section class="ticket hidden" id="stepsPanel">
+          <div class="ticket-head">
+            <h2 data-i18n="steps.title">Comment se connecter</h2>
+          </div>
+          <div class="tear" aria-hidden="true"></div>
+          <div class="ticket-body pad">
+            <ol class="steps" id="steps"></ol>
+          </div>
         </section>
       </div>
 
-      <p class="dim" style="text-align: center; font-size: var(--fs-sm); margin-top: 24px">
+      <p class="foot-note" style="margin-top: 24px" data-i18n="brand.foot">
         Lien personnel · ne le partagez avec personne d'autre.
       </p>
     </div>
