@@ -69,8 +69,6 @@ function renderCredentials(r) {
   const rows = [
     { key: "cred.account", value: r.account, secret: false },
     { key: "cred.password", value: r.password, secret: true },
-    { key: "cred.emailPassword", value: r.emailPassword, secret: true },
-    { key: "cred.backupEmail", value: r.backupEmail, secret: false },
   ].filter((x) => x.value);
 
   const wrap = $("creds");
@@ -121,10 +119,6 @@ function renderCredentials(r) {
   }
 
   show($("discardBox"), !!r.discarded);
-  if (r.remark) {
-    $("remarkBox").textContent = t("cred.remark", { value: r.remark });
-    show($("remarkBox"), true);
-  }
 
   const steps = skuSteps(r.service, r.steps);
   if (steps.length) {
