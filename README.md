@@ -15,7 +15,9 @@ desktop.
 
 **Agents** sign in to the admin panel, enter the customer's name and phone, and
 get a link to send them. Links can be copied, opened, searched, and revoked at
-any time. Revoking takes effect immediately.
+any time. Revoking takes effect immediately. The panel keeps a pool of backend
+order ids (each paired with its delivery token); the backend picked at link
+creation decides which order and token the customer's link is issued against.
 
 Nothing in a customer URL ever exposes the underlying order number or delivery
 token: the public id is a one-way hash of the order id, a per-link random value,

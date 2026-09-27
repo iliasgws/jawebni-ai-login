@@ -4,16 +4,20 @@ import path from "node:path";
 import crypto from "node:crypto";
 
 import {
+  addOrder,
   createLink,
   deleteLink,
+  deleteOrder,
+  getOrder,
   getLink,
   getSalt,
   isVerifyValid,
   listLinks,
+  listOrders,
   setVerify,
   clearVerify,
 } from "./lib/store.js";
-import { explain, ID_RE } from "./lib/ids.js";
+import { explain, ID_RE, maskMiddle } from "./lib/ids.js";
 import {
   DEFAULT_DELIVERY_TOKEN,
   GamsgoError,
@@ -319,11 +323,14 @@ async function handleCreateLink(req, res) {
     return sendError(res, 400, "order_invalid", "Identifiant de commande invalide.");
   }
 
+  // The admin's chosen backend decides which delivery token unlocks this
+  // customer's link — pool entry wins over the process-wide default.
+  const pool = await getOrder(orderSn);
   const rec = await createLink({
     name,
     phone,
     orderSn,
-    deliveryToken: process.env.GAMSGO_TOKEN || DEFAULT_DELIVERY_TOKEN,
+    deliveryToken: (pool && pool.deliveryToken) || DEFAULT_DELIVERY_TOKEN,
   });
   const salt = await getSalt();
   send(res, 200, { link: rec, recipe: explain(rec.orderSn, rec.nonce, salt) });
@@ -333,6 +340,109 @@ async function handleDeleteLink(req, res, id) {
   if (!requireAdmin(req, res)) return;
   const ok = await deleteLink(id);
   if (!ok) return sendError(res, 404, "not_found", "Lien introuvable.");
+  send(res, 200, { ok: true });
+}
+
+/* ------------------------------------------------------- backend orders */
+
+/** Safe shape for the panel: the raw delivery token never leaves the server. */
+function orderPayload(o) {
+  return {
+    orderSn: o.orderSn,
+    note: o.note || "",
+    tokenMask: o.deliveryToken ? maskMiddle(o.deliveryToken) : "",
+    isDefault: !!o.deliveryToken && o.deliveryToken === DEFAULT_DELIVERY_TOKEN,
+    meta: o.meta || null,
+    createdAt: o.createdAt,
+    updatedAt: o.updatedAt,
+  };
+}
+
+async function handleListOrders(req, res) {
+  if (!requireAdmin(req, res)) return;
+  send(res, 200, { orders: (await listOrders()).map(orderPayload) });
+}
+
+async function handleAddOrder(req, res) {
+  if (!requireAdmin(req, res)) return;
+  const sid = cookies(req).jaw_admin;
+  const body = await readBody(req);
+
+  const orderSn = String(body.orderSn || "").trim();
+  const deliveryToken = String(body.deliveryToken || "").trim();
+  const note = String(body.note || "").trim().slice(0, 120);
+  const validate = body.validate !== false;
+
+  if (!orderSn) return sendError(res, 400, "order_required", "Order id is required.");
+  if (!/^\d+$/.test(orderSn) && !/^[0-9a-zA-Z]{10}$/.test(orderSn)) {
+    return sendError(
+      res, 400, "order_format",
+      "Order id must be digits, or exactly 10 letters and digits.",
+    );
+  }
+  if (deliveryToken && !/^[0-9a-zA-Z]{8,64}$/.test(deliveryToken)) {
+    return sendError(res, 400, "token_invalid", "Delivery token must be 8–64 letters and digits.");
+  }
+  const token = deliveryToken || DEFAULT_DELIVERY_TOKEN;
+  if (!token) {
+    return sendError(
+      res, 400, "token_required",
+      "No delivery token — set GAMSGO_TOKEN or paste one with this order.",
+    );
+  }
+
+  let meta = null;
+  if (validate) {
+    if (!rateLimit(`ordervalidate:${sid}`, 30, 10 * 60_000)) {
+      return sendError(res, 429, "rate_limit", "Trop de vérifications. Réessayez plus tard.");
+    }
+    let data;
+    try {
+      data = await verifyOrder(orderSn, token);
+    } catch (err) {
+      if (err instanceof GamsgoError && (err.type === "network" || err.type === "bad_response")) {
+        return sendError(res, 502, err.type, err.message);
+      }
+      const type = err instanceof GamsgoError ? err.type : "verify_failed";
+      const message =
+        err instanceof GamsgoError ? err.message : "Impossible de vérifier cette commande.";
+      return sendError(res, 400, type, message);
+    }
+    if (!data.order_verify_token) {
+      return sendError(
+        res, 400, "order_unverified",
+        "Cette commande n'a pas pu être vérifiée auprès de GamsGo.",
+      );
+    }
+    meta = {
+      sku: data.sku || "",
+      planName: data.plan_name || "",
+      daysLeft: typeof data.days_left === "number" ? data.days_left : null,
+      discarded: !!data.discarded,
+      verifiedAt: new Date().toISOString(),
+    };
+  }
+
+  const prev = await getOrder(orderSn);
+  const rec = await addOrder({
+    orderSn,
+    deliveryToken: token,
+    note,
+    meta: meta || (prev && prev.meta) || null,
+  });
+  send(res, 200, { order: orderPayload(rec) });
+}
+
+async function handleDeleteOrder(req, res, rawSn) {
+  if (!requireAdmin(req, res)) return;
+  let orderSn = rawSn;
+  try {
+    orderSn = decodeURIComponent(rawSn);
+  } catch {
+    /* keep raw */
+  }
+  const ok = await deleteOrder(orderSn);
+  if (!ok) return sendError(res, 404, "not_found", "Commande introuvable.");
   send(res, 200, { ok: true });
 }
 
@@ -423,6 +533,7 @@ function normalizeJob(job) {
 
 const ROUTE_ID = /^\/(?:api\/v|v)\/([0-9A-HJKMNP-TV-Z]{20})(?:\/([a-z-]+))?$/;
 const ROUTE_ADMIN_ID = /^\/api\/admin\/links\/([0-9A-HJKMNP-TV-Z]{20})$/;
+const ROUTE_ADMIN_ORDER = /^\/api\/admin\/orders\/([^/]+)$/;
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
@@ -436,6 +547,11 @@ const server = http.createServer(async (req, res) => {
       if (req.method === "GET" && p === "/api/admin/session") return await handleAdminSession(req, res);
       if (req.method === "GET" && p === "/api/admin/links") return await handleListLinks(req, res);
       if (req.method === "POST" && p === "/api/admin/links") return await handleCreateLink(req, res);
+      if (req.method === "GET" && p === "/api/admin/orders") return await handleListOrders(req, res);
+      if (req.method === "POST" && p === "/api/admin/orders") return await handleAddOrder(req, res);
+
+      const adminOrder = p.match(ROUTE_ADMIN_ORDER);
+      if (adminOrder && req.method === "DELETE") return await handleDeleteOrder(req, res, adminOrder[1]);
 
       const adminId = p.match(ROUTE_ADMIN_ID);
       if (adminId && req.method === "DELETE") return await handleDeleteLink(req, res, adminId[1]);
