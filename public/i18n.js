@@ -75,6 +75,9 @@ const STRINGS = {
     "code.copy": "Copier le code",
 
     "steps.title": "Comment se connecter",
+    "guide.title": "Guide visuel",
+    "guide.alt":
+      "Comment se connecter : guide illustré en trois étapes — adresse e-mail, mot de passe, vérification.",
   },
 
   en: {
@@ -141,6 +144,9 @@ const STRINGS = {
     "code.copy": "Copy the code",
 
     "steps.title": "How to sign in",
+    "guide.title": "Visual guide",
+    "guide.alt":
+      "How to sign in: illustrated three-step guide — email address, password, verification.",
   },
 
   ar: {
@@ -206,6 +212,8 @@ const STRINGS = {
     "code.copy": "انسخ الرمز",
 
     "steps.title": "كيفية تسجيل الدخول",
+    "guide.title": "دليل مصور",
+    "guide.alt": "كيفية تسجيل الدخول: دليل مصور في ثلاث خطوات — البريد الإلكتروني، كلمة المرور، التحقق.",
   },
 };
 
