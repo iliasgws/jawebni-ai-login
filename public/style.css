@@ -284,6 +284,15 @@ h2 {
 .brand-card .brand-logo {
   height: 46px;
 }
+.guide-stack {
+  display: grid;
+  gap: 12px;
+}
+.guide-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 .brand small {
   display: block;
   font-size: var(--fs-xs);

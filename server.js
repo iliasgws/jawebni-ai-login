@@ -61,6 +61,7 @@ const MIME = {
   ".css": "text/css; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
+  ".webp": "image/webp",
   ".ico": "image/x-icon",
   ".json": "application/json; charset=utf-8",
 };
@@ -235,10 +236,6 @@ function publicPayload(rec, data) {
     daysLeft: data.days_left,
     account: data.account || "",
     password: data.password || "",
-    emailPassword: data.email_password || "",
-    backupEmail: data.backup_email || "",
-    codeUrl: data.code_url || "",
-    remark: data.remark || "",
     discarded: !!data.discarded,
     expired: data.days_left === 0,
     hasAccountTotp: !!data.has_account_totp,
