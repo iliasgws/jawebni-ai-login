@@ -440,6 +440,9 @@ h2 {
 .grid-2 {
   grid-template-columns: 1fr 1fr;
 }
+.grid-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
 
 /* ------------------------------------------------------------------ stamp */
 
@@ -492,7 +495,8 @@ label.field {
 input[type="text"],
 input[type="password"],
 input[type="tel"],
-input[type="search"] {
+input[type="search"],
+select {
   width: 100%;
   background: var(--stock-3);
   border: 1px solid var(--ctl);
@@ -503,23 +507,34 @@ input[type="search"] {
   font-family: inherit;
   transition: border-color 150ms ease-out, background-color 150ms ease-out;
 }
+select {
+  cursor: pointer;
+}
+select option {
+  background: var(--stock-2);
+  color: var(--ink);
+}
 input::placeholder {
   color: var(--ink-3);
 }
-input:hover {
+input:hover,
+select:hover {
   border-color: var(--ink-3);
 }
-input:focus {
+input:focus,
+select:focus {
   border-color: var(--gold-deep);
   background: var(--gold-wash);
   outline: none;
   box-shadow: 0 0 0 3px var(--gold-wash), 0 0 0 4px var(--gold-deep);
 }
-input[aria-invalid="true"] {
+input[aria-invalid="true"],
+select[aria-invalid="true"] {
   border-color: var(--oxide);
   background: var(--oxide-wash);
 }
-input[aria-invalid="true"]:focus {
+input[aria-invalid="true"]:focus,
+select[aria-invalid="true"]:focus {
   box-shadow: 0 0 0 3px var(--oxide-wash), 0 0 0 4px var(--oxide);
 }
 
@@ -527,6 +542,24 @@ input[aria-invalid="true"]:focus {
   margin-top: 7px;
   font-size: var(--fs-sm);
   color: var(--oxide);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 14px;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+  cursor: pointer;
+  user-select: none;
+}
+.check input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gold-deep);
+  cursor: pointer;
+  flex: none;
 }
 
 /* the access code reads as an unredeemed code strip */
@@ -1272,7 +1305,8 @@ ol.steps b {
 /* ------------------------------------------------------------ responsive */
 
 @media (max-width: 760px) {
-  .grid-2 {
+  .grid-2,
+  .grid-3 {
     grid-template-columns: 1fr;
   }
   .cred {
